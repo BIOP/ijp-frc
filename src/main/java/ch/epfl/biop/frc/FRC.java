@@ -1,11 +1,15 @@
 package ch.epfl.biop.frc;
 
 import ij.IJ;
+import ij.ImagePlus;
 import ij.ImageStack;
+import ij.measure.ResultsTable;
 import ij.process.FHT;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -563,4 +567,51 @@ public class FRC
 		}
 		return fire;
 	}
+	
+
+	/**
+	 * Utility function that calculates the Fourier Image Resolution (FIRE) number using the provided images.
+	 * 
+	 * @param ip1
+	 * @param ip2
+	 * @param method
+	 * @param rt 
+	 * @return The FIRE number (in pixels)
+	 */
+	public void batchCalculateFireNumber(File directory1, File directory2, ThresholdMethod method, ResultsTable rt)
+	{
+		// Navigate folder for tiffs
+		String[] the_files = directory1.list(new FilenameFilter() {
+			
+			@Override
+			public boolean accept(File dir, String name) {
+				// check extensions
+				if(name.endsWith("tif"))
+					return true;
+				
+				return false;
+			}
+		});
+		
+		// For each file, open one in each directory
+		for(String the_file : the_files) {
+			File f1 = new File(directory1.getAbsolutePath()+File.separator+the_file);
+			File f2 = new File(directory2.getAbsolutePath()+File.separator+the_file);
+			
+			if(f2.exists()) {
+				ImagePlus i1 = IJ.openImage(f1.getAbsolutePath());
+				ImagePlus i2 = IJ.openImage(f2.getAbsolutePath());
+				
+				double fire = calculateFireNumber(i1.getProcessor(), i2.getProcessor(),	method);
+				rt.incrementCounter();
+				rt.addLabel(i1.getTitle());
+				rt.addValue("FRC ["+method+"]", fire);
+				rt.addValue("FRC ["+method+"] Calibrated ["+i1.getCalibration().getUnit()+"]", fire*i1.getCalibration().pixelHeight);
+				rt.show("FRC Results");
+			}
+			
+		}
+		
+	}
+	
 }

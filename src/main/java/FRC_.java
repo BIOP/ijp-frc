@@ -1,20 +1,28 @@
-import ch.epfl.biop.frc.FRC.ThresholdMethod;
-import fiji.util.gui.GenericDialogPlus;
-
 import java.io.File;
 
 import ch.epfl.biop.frc.FRC;
+import ch.epfl.biop.frc.FRC.ThresholdMethod;
+import fiji.util.gui.GenericDialogPlus;
 import ij.IJ;
 import ij.ImageJ;
 import ij.ImagePlus;
 import ij.Prefs;
 import ij.WindowManager;
 import ij.gui.GenericDialog;
+import ij.gui.Plot;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
-import ij.gui.Plot;
 
 
+/**
+ * @author Olivier Burri
+ * BioImaging And Optics Platform (BIOP)
+ * EPFL Lausanne, Switzerland
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation;
+ */
 public class FRC_ implements PlugIn {
 	
 	private static ResultsTable rt;
@@ -33,7 +41,7 @@ public class FRC_ implements PlugIn {
 		}
 		
 		// Initialize Results Table
-		if (rt == null)
+		if (rt == null || WindowManager.getWindow("FRC Results") == null)
 			rt = new ResultsTable();
 
 		// Call FRC Class

@@ -27,10 +27,14 @@ import org.apache.commons.math3.util.FastMath;
  * http://www.nature.com/nmeth/journal/v10/n6/full/nmeth.2448.html
  */
 /**
- * @author oburri
+ * @author Olivier Burri
+ * @author Alex Herbert
  *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation;
  */
-public class FRC
+ public class FRC
 {
 	public enum ThresholdMethod
 	{

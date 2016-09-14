@@ -167,8 +167,9 @@ public class FRC_ implements PlugIn {
 		
 		
 		// run the plugin
-		IJ.runPlugIn(clazz.getName(),"batch");
-
+		IJ.runPlugIn(clazz.getName(),"");
+		//IJ.runPlugIn(clazz.getName(),"batch"); // Running the plugin for batch processing.
+		
 	}
 
 }

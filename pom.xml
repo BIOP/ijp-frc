@@ -8,12 +8,12 @@
 	<parent>
 		<groupId>net.imagej</groupId>
 		<artifactId>pom-imagej</artifactId>
-		<version>7.0.0</version>
+		<version>16.4.1</version>
 		<relativePath />
 	</parent>
 
 	<artifactId>FRC_</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 
 	<name>plugins/FRC_.jar</name>
 	<repositories>
@@ -69,8 +69,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
-			<version>3.6.1</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>fiji-lib</artifactId>

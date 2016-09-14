@@ -2,7 +2,6 @@ import ch.epfl.biop.frc.FRC.ThresholdMethod;
 import fiji.util.gui.GenericDialogPlus;
 
 import java.io.File;
-import java.io.FilenameFilter;
 
 import ch.epfl.biop.frc.FRC;
 import ij.IJ;
@@ -13,7 +12,7 @@ import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.measure.ResultsTable;
 import ij.plugin.PlugIn;
-
+import ij.gui.Plot;
 
 
 public class FRC_ implements PlugIn {
@@ -39,13 +38,17 @@ public class FRC_ implements PlugIn {
 
 		// Call FRC Class
 		FRC frc = new FRC();
+
+		// Default Threshold
+		int thr_i 	 = (int) Prefs.get(pref+"thrm.index", 0);
 		
+		// Default plot choice
+		boolean is_plot = Prefs.get(pref+"is.plot", false);
 
 		if(arg.compareTo("batch") == 0) {
 			// Grab defaults
 			String dir1  = Prefs.get(pref+"dir1", "");
 			String dir2  = Prefs.get(pref+"dir2", "");
-			int thr_i 	 = (int) Prefs.get(pref+"thrm.index", 0);
 			
 			
 			
@@ -56,27 +59,31 @@ public class FRC_ implements PlugIn {
 			gdp.addDirectoryField("First Folder", dir1);
 			gdp.addDirectoryField("Second Folder", dir2);
 			gdp.addChoice("Resolution Criteria",thr_names, thr_names[thr_i]);
-			
+			gdp.addCheckbox("Save Plot", is_plot);
+
 			gdp.showDialog();
 			
 			if(gdp.wasCanceled()) return;
 			
 			// Navigate the directories, and find files
-			dir1 = gdp.getNextString();
-			dir2 = gdp.getNextString();
-			thr_i = gdp.getNextChoiceIndex();
+			dir1    = gdp.getNextString();
+			dir2    = gdp.getNextString();
+			thr_i   = gdp.getNextChoiceIndex();
+			is_plot = gdp.getNextBoolean();
 			
 			File d1 = new File(dir1);
 			File d2 = new File(dir2);
 			ThresholdMethod tm = thr_methods[thr_i];
 			
+			
 			// Save preferences
 			Prefs.set(pref+"dir1", dir1);
 			Prefs.set(pref+"dir2", dir2);
 			Prefs.set(pref+"thrm.index", thr_i);
+			Prefs.set(pref+"is.plot", is_plot);
 			
 			
-			frc.batchCalculateFireNumber(d1, d2, tm, rt);					
+			frc.batchCalculateFireNumber(d1, d2, tm, rt, is_plot);					
 			
 		} else {
 			// Run normal plugin
@@ -94,8 +101,8 @@ public class FRC_ implements PlugIn {
 			GenericDialog gd = new GenericDialog("FRC Calculation");
 			gd.addChoice("Image_1", image_list, image_list[0]);
 			gd.addChoice("Image_2", image_list, image_list[1]);
-			gd.addChoice("Resolution Criteria",thr_names, thr_names[0]);
-			
+			gd.addChoice("Resolution Criteria",thr_names, thr_names[thr_i]);
+			gd.addCheckbox("Display Plot", is_plot);
 			gd.showDialog();
 			
 			if(gd.wasCanceled()) {
@@ -103,19 +110,38 @@ public class FRC_ implements PlugIn {
 			}
 			
 			// Everything is ready now
-			
 			ImagePlus im1 = WindowManager.getImage(gd.getNextChoice());
 			ImagePlus im2 = WindowManager.getImage(gd.getNextChoice());
+			thr_i = gd.getNextChoiceIndex();
+			is_plot = gd.getNextBoolean();
+
+			ThresholdMethod tm = thr_methods[thr_i];
 			
-			ThresholdMethod tm = thr_methods[gd.getNextChoiceIndex()];
+			// Set Preferences again
+			Prefs.set(pref+"thrm.index", thr_i);
+			Prefs.set(pref+"is.plot", is_plot);
+
+			// Finally calculate FRC
+			double[][] frc_curve = frc.calculateFrcCurve(im1.getProcessor(), im2.getProcessor());
 			
-			double fire = frc.calculateFireNumber(im1.getProcessor(), im2.getProcessor(), tm);
+			// Smooth Curve
+			double[][] smooth_frc = frc.getSmoothedCurve(frc_curve);
+			
+			// Fourier Image REsolution number ("FIRE")
+			double fire = frc.calculateFireNumber(smooth_frc, tm);
 							
+			
+			// Plot if requested
+			if(is_plot) {
+				Plot p = frc.doPlot(frc_curve, smooth_frc, tm, fire, im1.getTitle());
+				p.show();
+			}
 			rt.incrementCounter();
 			rt.addLabel(im1.getTitle()+":"+im2.getTitle());
 			rt.addValue("FRC ["+tm+"]", fire);
 			rt.addValue("FRC ["+tm+"] Calibrated ["+im1.getCalibration().getUnit()+"]", fire*im1.getCalibration().pixelHeight);
 			rt.show("FRC Results");
+			
 		}
 
 	}
@@ -141,7 +167,7 @@ public class FRC_ implements PlugIn {
 		
 		
 		// run the plugin
-		IJ.runPlugIn(clazz.getName(), "batch");
+		IJ.runPlugIn(clazz.getName(),"batch");
 
 	}
 

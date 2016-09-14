@@ -3,11 +3,14 @@ package ch.epfl.biop.frc;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.gui.Plot;
+import ij.gui.PlotWindow;
 import ij.measure.ResultsTable;
 import ij.process.FHT;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -22,6 +25,10 @@ import org.apache.commons.math3.util.FastMath;
  * Adapted from the FIRE (Fourier Image REsolution) plugin produced as part of the paper:<br>
  * Niewenhuizen, et al (2013). Measuring image resolution in optical nanoscopy. Nature Methods, 10, 557<br>
  * http://www.nature.com/nmeth/journal/v10/n6/full/nmeth.2448.html
+ */
+/**
+ * @author oburri
+ *
  */
 public class FRC
 {
@@ -64,7 +71,7 @@ public class FRC
 	 * 
 	 * @param ip1
 	 * @param ip2
-	 * @return An array of triples representing [][radius,correlation,N] where correlation is the FRC at the given
+	 * @return An array of triplets representing [][radius,correlation,N] where correlation is the FRC at the given
 	 *         radius from the centre of the Fourier transform (i.e. 1/spatial frequency) and N is the number of samples
 	 *         used to compute the correlation
 	 */
@@ -569,16 +576,21 @@ public class FRC
 	}
 	
 
+
 	/**
-	 * Utility function that calculates the Fourier Image Resolution (FIRE) number using the provided images.
+	 * Convenience function to batch calculate the FRC by going though file on two separate directories. 
+	 * When one file name is identical in both directories, it opens them and computes the FRC.
+	 * If is_save_plot is true, then a plot of the FRC and FIRE calculations is saved in the parent of 
+	 * directory1 in a folder named "Graphs"
+	 * NOTE: This only works for TIFF files at the moment.
 	 * 
-	 * @param ip1
-	 * @param ip2
-	 * @param method
-	 * @param rt 
-	 * @return The FIRE number (in pixels)
+	 * @param directory1 is the first directory containing data
+	 * @param directory2 is the first directory containing data
+	 * @param method is the {@link ThresholdMethod} used
+	 * @param rt is the {@link ij.measure.ResultsTable} where you want the batch to write the FIRE number to
+	 * @param is_save_plot defines whether the plot will be saved, as described above.
 	 */
-	public void batchCalculateFireNumber(File directory1, File directory2, ThresholdMethod method, ResultsTable rt)
+	public void batchCalculateFireNumber(File directory1, File directory2, ThresholdMethod method, ResultsTable rt, boolean is_save_plot)
 	{
 		// Navigate folder for tiffs
 		String[] the_files = directory1.list(new FilenameFilter() {
@@ -593,6 +605,10 @@ public class FRC
 			}
 		});
 		
+		// Prepare saving if necessary
+		File save_dir = new File(directory1.getParentFile(), "Graphs");
+		save_dir.mkdir();
+		
 		// For each file, open one in each directory
 		for(String the_file : the_files) {
 			File f1 = new File(directory1.getAbsolutePath()+File.separator+the_file);
@@ -602,16 +618,87 @@ public class FRC
 				ImagePlus i1 = IJ.openImage(f1.getAbsolutePath());
 				ImagePlus i2 = IJ.openImage(f2.getAbsolutePath());
 				
-				double fire = calculateFireNumber(i1.getProcessor(), i2.getProcessor(),	method);
+				// Finally calculate FRC
+				double[][] frc_curve = calculateFrcCurve(i1.getProcessor(), i2.getProcessor());
+				
+				double[][] smooth_frc = getSmoothedCurve(frc_curve);
+
+				// Fourier Image REsolution number ("FIRE")
+				double fire = calculateFireNumber(smooth_frc, method);
+				
 				rt.incrementCounter();
 				rt.addLabel(i1.getTitle());
 				rt.addValue("FRC ["+method+"]", fire);
 				rt.addValue("FRC ["+method+"] Calibrated ["+i1.getCalibration().getUnit()+"]", fire*i1.getCalibration().pixelHeight);
 				rt.show("FRC Results");
+				
+				if(is_save_plot) {
+					Plot p = doPlot(frc_curve, smooth_frc, method, fire, i1.getTitle());
+					
+					ImagePlus plot_image = p.makeHighResolution(null, 3, true, false);
+					String plot_name = save_dir.getAbsolutePath()+File.separator+f1.getName().substring(0,f1.getName().lastIndexOf("."));
+					plot_name += "_"+method.toString().replaceAll("/", " over ")+".tif";
+					IJ.save(plot_image, plot_name);
+				}
 			}
 			
 		}
 		
+	}
+	
+	/**
+	 * Simple method to plot the data using {@link ij.gui.Plot #Plot}
+	 * @param frc_curve is the raw FRC curve
+	 * @param smooth_frc is the smoothed curve computed using {@link #getSmoothedCurve(double[][])} or {@link #getSmoothedCurve(double[][], double, int)}
+	 * @param tm is the {@link ThresholdMethod} used
+	 * @param fire is the Fourier Image Resolution given by {@link #calculateFireNumber(double[][], ThresholdMethod)}
+	 * @param name is the title of the image that was used for the FRC calculations
+	 * @return a Plot object to use at your convenience
+	 */
+	public Plot doPlot(double[][] frc_curve, double[][] smooth_frc, ThresholdMethod tm, double fire, String name) {
+		FRC frc = new FRC();
+		
+		Plot p = new Plot("FRC Of "+name, "Spatial Frequency", "Correlation");
+		p.draw();
+
+		// Prepare arrays
+		double[] x  = new double[frc_curve.length];
+		double[] y  = new double[frc_curve.length];
+		double[] sy = new double[frc_curve.length];
+		
+		for(int i=0; i<frc_curve.length; i++) {
+			x[i]  =  frc_curve[i][0]/(2*(frc_curve.length+1));
+			y[i]  =  frc_curve[i][1];
+			sy[i] = smooth_frc[i][1];
+		}
+		// Get Curve of Threshold
+		
+		double[] thr_curve = frc.calculateThresholdCurve(smooth_frc, tm);
+		
+		p.setLineWidth(1);
+		// Set Limits
+		p.setLimits(0, x[x.length-1], 0, 1);
+		
+		// Add Original Data in black
+		p.setColor(new Color(0, 0, 0));
+		p.addPoints(x, y, PlotWindow.LINE);
+		
+		// Add Smoothed Curve in clear red
+		p.setColor(new Color(255, 120, 120));
+		p.addPoints(x, sy, PlotWindow.LINE);
+
+		// Add Threshold Curve in clear blue
+		p.setColor(new Color(120, 120, 255));
+		p.addPoints(x, thr_curve, PlotWindow.LINE);
+
+		// Add Threshold Curve in gray
+		p.setColor(new Color(69, 69, 69));
+		p.drawLine(1/fire, 0, 1/fire, 1);
+		
+		// Add info on the position of the FIRE number on the graph with an arrow
+		p.addLabel(0.02, 0.3, "FIRE = "+String.format("%.3f", fire));
+		p.addLegend("FRC\nSmoothed FRC\nThreshold");
+		return p;
 	}
 	
 }

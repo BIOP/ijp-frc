@@ -22,6 +22,7 @@ import ij.plugin.PlugIn;
  * The FRC_ Plugin exposes the functionality of the FRC class originally written
  * by Alex Herbert at The Genome Damage and Stability Centre, University of Sussex
  * 
+ * Copyright (C) 2016  Olivier Burri
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

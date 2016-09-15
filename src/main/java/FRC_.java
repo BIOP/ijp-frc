@@ -19,6 +19,10 @@ import ij.plugin.PlugIn;
  * BioImaging And Optics Platform (BIOP)
  * EPFL Lausanne, Switzerland
  * 
+ * The FRC_ Plugin exposes the functionality of the FRC class originally written
+ * by Alex Herbert at The Genome Damage and Stability Centre, University of Sussex
+ * 
+ * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation;
@@ -47,20 +51,20 @@ public class FRC_ implements PlugIn {
 		// Call FRC Class
 		FRC frc = new FRC();
 
-		// Default Threshold
+		
+		// Default Threshold Method
 		int thr_i 	 = (int) Prefs.get(pref+"thrm.index", 0);
 		
 		// Default plot choice
 		boolean is_plot = Prefs.get(pref+"is.plot", false);
 
 		if(arg.compareTo("batch") == 0) {
-			// Grab defaults
+
+			// Grab previous directories
 			String dir1  = Prefs.get(pref+"dir1", "");
 			String dir2  = Prefs.get(pref+"dir2", "");
-			
-			
-			
-			// Run batch here
+						
+			// Different Dialog
 			GenericDialogPlus gdp = new GenericDialogPlus("Batch FRC Calculation");
 			
 			gdp.addMessage("Two folders must be provided.\nEach folder has a matching file in the other.");
@@ -73,39 +77,39 @@ public class FRC_ implements PlugIn {
 			
 			if(gdp.wasCanceled()) return;
 			
-			// Navigate the directories, and find files
+			// Get choices
 			dir1    = gdp.getNextString();
 			dir2    = gdp.getNextString();
 			thr_i   = gdp.getNextChoiceIndex();
 			is_plot = gdp.getNextBoolean();
-			
-			File d1 = new File(dir1);
-			File d2 = new File(dir2);
-			ThresholdMethod tm = thr_methods[thr_i];
-			
 			
 			// Save preferences
 			Prefs.set(pref+"dir1", dir1);
 			Prefs.set(pref+"dir2", dir2);
 			Prefs.set(pref+"thrm.index", thr_i);
 			Prefs.set(pref+"is.plot", is_plot);
+						
 			
+			// Call the bath FIRE calculator method
 			
+			File d1 = new File(dir1);
+			File d2 = new File(dir2);
+			ThresholdMethod tm = thr_methods[thr_i];
+						
 			frc.batchCalculateFireNumber(d1, d2, tm, rt, is_plot);					
 			
 		} else {
-			// Run normal plugin
 			
-			// Find number of current images
-			int n_images = WindowManager.getImageCount();
+			// Run plugin that will work on two open images
 			
+			// Get Current Images		
 			String[] image_list = WindowManager.getImageTitles();
 			
-			// Prefill smartness
-			if(n_images<2) {
+			if(image_list.length<2) {
 				IJ.error("Need at least 2 images open for FRC Computation");
 			}
 	
+			// Make Dialog choices
 			GenericDialog gd = new GenericDialog("FRC Calculation");
 			gd.addChoice("Image_1", image_list, image_list[0]);
 			gd.addChoice("Image_2", image_list, image_list[1]);
@@ -129,29 +133,30 @@ public class FRC_ implements PlugIn {
 			Prefs.set(pref+"thrm.index", thr_i);
 			Prefs.set(pref+"is.plot", is_plot);
 
+			
 			// Finally calculate FRC
 			double[][] frc_curve = frc.calculateFrcCurve(im1.getProcessor(), im2.getProcessor());
 			
-			// Smooth Curve
+			// Smooth Curve using LOESS
 			double[][] smooth_frc = frc.getSmoothedCurve(frc_curve);
 			
 			// Fourier Image REsolution number ("FIRE")
 			double fire = frc.calculateFireNumber(smooth_frc, tm);
-							
 			
-			// Plot if requested
-			if(is_plot) {
-				Plot p = frc.doPlot(frc_curve, smooth_frc, tm, fire, im1.getTitle());
-				p.show();
-			}
+			// Append results
 			rt.incrementCounter();
 			rt.addLabel(im1.getTitle()+":"+im2.getTitle());
 			rt.addValue("FRC ["+tm+"]", fire);
 			rt.addValue("FRC ["+tm+"] Calibrated ["+im1.getCalibration().getUnit()+"]", fire*im1.getCalibration().pixelHeight);
 			rt.show("FRC Results");
 			
+			
+			// Plot if requested
+			if(is_plot) {
+				Plot p = frc.doPlot(frc_curve, smooth_frc, tm, fire, im1.getTitle());
+				p.show();
+			}			
 		}
-
 	}
 
 	public static void main(String[] args) {
@@ -176,7 +181,7 @@ public class FRC_ implements PlugIn {
 		
 		// run the plugin
 		IJ.runPlugIn(clazz.getName(),"");
-		//IJ.runPlugIn(clazz.getName(),"batch"); // Running the plugin for batch processing.
+		//IJ.runPlugIn(clazz.getName(),"batch"); // Running the plugin to test batch processing.
 		
 	}
 

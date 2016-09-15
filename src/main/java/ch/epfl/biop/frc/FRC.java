@@ -20,19 +20,20 @@ import org.apache.commons.math3.analysis.interpolation.LoessInterpolator;
 import org.apache.commons.math3.util.FastMath;
 
 /**
- * Compute the Fourier Ring Correlation, a measure of the resolution of a microscopy image.
- * <p>
- * Adapted from the FIRE (Fourier Image REsolution) plugin produced as part of the paper:<br>
- * Niewenhuizen, et al (2013). Measuring image resolution in optical nanoscopy. Nature Methods, 10, 557<br>
- * http://www.nature.com/nmeth/journal/v10/n6/full/nmeth.2448.html
- */
-/**
  * @author Olivier Burri
  * @author Alex Herbert
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation;
+ */
+/**
+ * Compute the Fourier Ring Correlation, a measure of the resolution of a microscopy image.
+ * <p>
+ * Adapted from the FIRE (Fourier Image REsolution) plugin produced as part of the paper:
+ * <a href="http://www.nature.com/nmeth/journal/v10/n6/full/nmeth.2448.html">
+ * Niewenhuizen, et al (2013). Measuring image resolution in optical nanoscopy. Nature Methods, 10, 557</a>
+ * 
  */
  public class FRC
 {
@@ -660,26 +661,40 @@ import org.apache.commons.math3.util.FastMath;
 	 * @return a Plot object to use at your convenience
 	 */
 	public Plot doPlot(double[][] frc_curve, double[][] smooth_frc, ThresholdMethod tm, double fire, String name) {
+		
 		FRC frc = new FRC();
 		
-		Plot p = new Plot("FRC Of "+name, "Spatial Frequency", "Correlation");
-		p.draw();
-
-		// Prepare arrays
+		
+		// Prepare arrays for Plot class
 		double[] x  = new double[frc_curve.length];
 		double[] y  = new double[frc_curve.length];
 		double[] sy = new double[frc_curve.length];
 		
+		
 		for(int i=0; i<frc_curve.length; i++) {
+			// Since the Fourier calculation only uses half of the image (from centre to the edge) 
+			// we must double the curve length to get the original maximum image width. In addition
+			// the computation was up to the edge-1 pixels so add back a pixel to the curve length.
+			// If we divide the value of the x axes by the highest spatial frequency (representing 1 pixel^-1)
+			// we can get a calibrated frequency axis.
 			x[i]  =  frc_curve[i][0]/(2*(frc_curve.length+1));
+			
+			// Original FRC curve
 			y[i]  =  frc_curve[i][1];
+			
+			// Smoothed FRC Curve
 			sy[i] = smooth_frc[i][1];
 		}
 		// Get Curve of Threshold
 		
+		// Curve representing the Threshold method calculation that should intercept with the FRC Curve
 		double[] thr_curve = frc.calculateThresholdCurve(smooth_frc, tm);
 		
+		// Plot the data
+		Plot p = new Plot("FRC Of "+name, "Spatial Frequency", "Correlation");
+
 		p.setLineWidth(1);
+
 		// Set Limits
 		p.setLimits(0, x[x.length-1], 0, 1);
 		
@@ -695,13 +710,16 @@ import org.apache.commons.math3.util.FastMath;
 		p.setColor(new Color(120, 120, 255));
 		p.addPoints(x, thr_curve, PlotWindow.LINE);
 
-		// Add Threshold Curve in gray
+		// Add FIRE number line in gray
 		p.setColor(new Color(69, 69, 69));
 		p.drawLine(1/fire, 0, 1/fire, 1);
 		
-		// Add info on the position of the FIRE number on the graph with an arrow
+		// Add the FIRE number on the graph
 		p.addLabel(0.02, 0.3, "FIRE = "+String.format("%.3f", fire));
+		
+		// Add legend to the plot
 		p.addLegend("FRC\nSmoothed FRC\nThreshold");
+		
 		return p;
 	}
 	

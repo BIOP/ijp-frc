@@ -1,6 +1,6 @@
+package ch.epfl.biop.frc;
 import java.io.File;
 
-import ch.epfl.biop.frc.FRC;
 import ch.epfl.biop.frc.FRC.ThresholdMethod;
 import fiji.util.gui.GenericDialogPlus;
 import ij.IJ;

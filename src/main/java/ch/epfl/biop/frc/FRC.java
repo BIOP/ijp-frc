@@ -131,8 +131,7 @@ import org.apache.commons.math3.util.FastMath;
 
 		int radius = 1;
 		final double centre = size / 2;
-		final double max = centre - 1;
-
+	    final double max = (Math.max(maxWidth, maxHeight)/2) - 1;
 		IJ.showStatus("Calculating FRC curve...");
 
 		double[][] frcCurve = new double[(int) max][3];
@@ -165,8 +164,8 @@ import org.apache.commons.math3.util.FastMath;
 			final double limit = (useHalfCircle) ? 180 : 360;
 			while (angle < limit)
 			{
-				double x = centre + radius * Math.cos(angle);
-				double y = centre + radius * Math.sin(angle);
+				double x = centre + radius * Math.cos(angle / 360 * 2*Math.PI);
+				double y = centre + radius * Math.sin(angle / 360 * 2*Math.PI);
 
 				double[] values = getInterpolatedValues(x, y, images, size);
 				sum1 += values[0];
@@ -194,6 +193,9 @@ import org.apache.commons.math3.util.FastMath;
 
 	private ImageProcessor pad(ImageProcessor ip, int width, int height)
 	{
+		// Make sure width and height are even
+		width = width%2 == 0 ? width : width+1;
+		height = height%2 == 0 ? height : height+1;
 		if (ip.getWidth() != width || ip.getHeight() != height)
 		{
 			ImageProcessor ip2 = ip.createProcessor(width, height);

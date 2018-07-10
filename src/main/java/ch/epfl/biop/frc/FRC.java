@@ -155,17 +155,16 @@ import org.apache.commons.math3.util.FastMath;
 			double sum3 = 0;
 
 			// Circumference is 2*pi*r
-			double numSteps = perimeterSamplingFactor * Math.PI * radius;
-			double angleStep = 180.0 / numSteps;
+		    double angleStep = 1 / (perimeterSamplingFactor * radius);
 
 			double angle = 0D;
 			int numSum = 0;
 
-			final double limit = (useHalfCircle) ? 180 : 360;
+			final double limit = (useHalfCircle) ?  Math.PI :  2 * Math.PI;
 			while (angle < limit)
 			{
-				double x = centre + radius * Math.cos(angle / 360 * 2*Math.PI);
-				double y = centre + radius * Math.sin(angle / 360 * 2*Math.PI);
+				double x = centre + radius * Math.cos(angle);
+				double y = centre + radius * Math.sin(angle);
 
 				double[] values = getInterpolatedValues(x, y, images, size);
 				sum1 += values[0];
@@ -427,7 +426,7 @@ import org.apache.commons.math3.util.FastMath;
 			switch (method)
 			{
 				case HALF_BIT:
-					threshold[i] = ((0.2071 * Math.sqrt(frcCurve[i][2]) + 1.9102) / (1.2701 * Math.sqrt(frcCurve[i][2]) + 0.9102));
+					threshold[i] = ((0.2071 * Math.sqrt(frcCurve[i][2]) + 1.9102) / (1.2071 * Math.sqrt(frcCurve[i][2]) + 0.9102));
 					break;
 				case THREE_SIGMA:
 					threshold[i] = (3.0 / Math.sqrt(frcCurve[i][2] / 2.0));
@@ -616,10 +615,7 @@ import org.apache.commons.math3.util.FastMath;
 			@Override
 			public boolean accept(File dir, String name) {
 				// check extensions
-				if(name.endsWith("tif"))
-					return true;
-				
-				return false;
+				return true;				
 			}
 		});
 		
@@ -653,7 +649,7 @@ import org.apache.commons.math3.util.FastMath;
 				if(is_save_plot) {
 					Plot p = doPlot(frc_curve, smooth_frc, method, fire, i1.getTitle());
 					
-					ImagePlus plot_image = p.makeHighResolution(null, 3, true, false);
+					ImagePlus plot_image = p.makeHighResolution("FRC", 3, true, false);
 					String plot_name = save_dir.getAbsolutePath()+File.separator+f1.getName().substring(0,f1.getName().lastIndexOf("."));
 					plot_name += "_"+method.toString().replaceAll("/", " over ")+".tif";
 					IJ.save(plot_image, plot_name);

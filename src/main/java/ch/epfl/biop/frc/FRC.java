@@ -123,7 +123,19 @@ import org.apache.commons.math3.util.FastMath;
 		{
 			for (int x = size; x-- > 0; i--)
 			{
-				numerator[i] = dataA1[i] * dataA2[i] + dataB1[i] * dataB2[i];
+				// A remark from Brian Patton, University of Strathclyde, Glasgow says that the original
+				// computation for the numerator was wrong, namely:
+				// numerator[i] = dataA1[i] * dataA2[i] + dataB1[i] * dataB2[i];
+
+				// And should be instead:
+				// abs((FFT(Image1)*Complex_Conj(FFT(Image2)))
+				// Code is modified as follows.
+				float numrel =  dataA1[i] * dataA2[i] +  dataB1[i] * dataB2[i];
+				float numim  =  dataB1[i] * dataA2[i] -  dataA1[i] * dataB2[i];
+				// New numerator
+				numerator[i] = (float) Math.sqrt( numrel * numrel + numim * numim );
+
+
 				absFFT1[i] = dataA1[i] * dataA1[i] + dataB1[i] * dataB1[i];
 				absFFT2[i] = dataA2[i] * dataA2[i] + dataB2[i] * dataB2[i];
 			}

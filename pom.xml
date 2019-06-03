@@ -54,8 +54,18 @@
 		<contributor>
 			<name>Olivier Burri</name>
 			<url>http://biop.epfl.ch</url>
-			<roles><role>founder</role></roles>
+			<roles>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>support</role>
+				<role>maintainer</role>
+			</roles>
 			<properties><id>oburri</id></properties>
+		</contributor>
+		<contributor>
+			<name>Joao Firmino</name>
+			<url>https://www.camilod.ca/the-team</url>
+			<properties><id>JoaoFirmino</id></properties>
 		</contributor>
 	</contributors>
 
@@ -84,7 +94,7 @@
 		<main-class>FRC_</main-class>
 		<license.copyrightOwners>BIOP</license.copyrightOwners>
 		<scijava.app.directory>C:/Fiji/</scijava.app.directory>
-		<scijava.app.subdirectory><plugins/>BIOP</scijava.app.subdirectory>
+		<scijava.app.subdirectory>plugins/BIOP</scijava.app.subdirectory>
 	</properties>
 
 	<dependencies>

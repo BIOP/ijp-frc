@@ -71,13 +71,13 @@
 
 	<mailingLists>
 		<mailingList>
-			<name>ImageJ Forum</name>
-			<archive>http://forum.imagej.net/</archive>
+			<name>Image.sc Forum</name>
+			<archive>https://forum.image.sc</archive>
 		</mailingList>
 	</mailingLists>
 	<issueManagement>
-		<url>N/A</url>
-		<system>email</system>
+		<url>https://github.com/BIOP/ijp-frc/issues</url>
+		<system>GitHub Issues</system>
 	</issueManagement>
 	<ciManagement>
 		<system>none</system>

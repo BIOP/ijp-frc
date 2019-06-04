@@ -133,8 +133,7 @@ import org.apache.commons.math3.util.FastMath;
 				float numrel =  dataA1[i] * dataA2[i] +  dataB1[i] * dataB2[i];
 				float numim  =  dataB1[i] * dataA2[i] -  dataA1[i] * dataB2[i];
 				// New numerator
-				numerator[i] = (float) Math.sqrt( numrel * numrel + numim * numim );
-
+				numerator[i] = numrel * numrel + numim * numim;
 
 				absFFT1[i] = dataA1[i] * dataA1[i] + dataB1[i] * dataB1[i];
 				absFFT2[i] = dataA2[i] * dataA2[i] + dataB2[i] * dataB2[i];
@@ -187,7 +186,7 @@ import org.apache.commons.math3.util.FastMath;
 				angle += angleStep;
 			}
 
-			double val = sum1 / Math.sqrt(sum2 * sum3);
+			double val = Math.sqrt(sum1) / Math.sqrt(sum2 * sum3);
 
 			frcCurve[radius][0] = radius;
 			frcCurve[radius][1] = val;

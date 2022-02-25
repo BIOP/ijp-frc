@@ -28,11 +28,6 @@
 			<url>https://maven.scijava.org/content/groups/public</url>
 		</repository>
 	</repositories>
-
-	<ciManagement>
-		<system>GitHub Actions</system>
-		<url>https://github.com/BIOP/ijp-frc/actions</url>
-	</ciManagement>
 	
 	<name>Fourier Ring Correlation Plugin</name>
 	<url>https://imagej.net/plugins/fourier-ring-correlation</url>
@@ -106,9 +101,6 @@
 		<license.copyrightOwners>BIOP</license.copyrightOwners>
 		<scijava.app.directory>C:/Fiji/</scijava.app.directory>
 		<scijava.app.subdirectory>plugins/BIOP</scijava.app.subdirectory>
-
-		<!-- NB: Deploy releases to the SciJava Maven repository. -->
-		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
 	</properties>
 
 	<dependencies>

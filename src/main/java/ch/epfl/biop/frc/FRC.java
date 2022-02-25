@@ -453,7 +453,7 @@ import org.apache.commons.math3.util.FastMath;
 
 	/**
 	 * Computes the crossing points of the FRC curve and the threshold curve. The intersections can be used to determine
-	 * the image resolution using {@link #getCorrectIntersection(ArrayList, ThresholdMethod)}
+	 * the image resolution using {@link FRC#getCorrectIntersection(double[], ThresholdMethod)}
 	 * 
 	 * @param frcCurve
 	 * @param thresholdCurve

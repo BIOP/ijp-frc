@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-		https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0   https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -14,7 +11,7 @@
 
 	<groupId>ch.epfl.biop</groupId>
 	<artifactId>FRC_</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
 
 	<description>Making use of the Fourier Ring Correlation Implementation by Alex Herbert
 		which is itself 'adapted from the FIRE (Fourier Image REsolution) plugin produced as part of the paper
@@ -96,7 +93,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/BIOP/ijp-frc</connection>
 		<developerConnection>scm:git:git@github.com:BIOP/ijp-frc</developerConnection>
-		<tag>HEAD</tag>
+		<tag>FRC_-1.0.3</tag>
 		<url>https://github.com/BIOP/ijp-frc.git</url>
 	</scm>
 

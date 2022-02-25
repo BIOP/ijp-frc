@@ -1,3 +1,5 @@
+[![](https://github.com/BIOP/ijp-frc/actions/workflows/build-main.yml/badge.svg)](https://github.com/BIOP/ijp-frc/actions/workflows/build-main.yml)
+
 Fourier Ring Correlation ImageJ Plugin
 ======================================
 

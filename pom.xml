@@ -8,21 +8,29 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>26.0.0</version>
+		<version>31.1.0</version>
 		<relativePath />
 	</parent>
 
-	<version>1.0.2</version>
+	<groupId>ch.epfl.biop</groupId>
+	<artifactId>FRC_</artifactId>
+	<version>1.0.3-SNAPSHOT</version>
+
+	<description>Making use of the Fourier Ring Correlation Implementation by Alex Herbert
+		which is itself 'adapted from the FIRE (Fourier Image REsolution) plugin produced as part of the paper
+		Niewenhuizen, et al (2013). Measuring image resolution in optical nanoscopy. Nature Methods, 10, 557
+		http://www.nature.com/nmeth/journal/v10/n6/full/nmeth.2448.html</description>
+
+    <!-- NB: for project parent -->
 	<repositories>
-	  <!-- NB: for project parent -->
-	  <repository>
-	    <id>imagej.public</id>
-	    <url>http://maven.imagej.net/content/groups/public</url>
-	  </repository>  
+		<repository>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
+		</repository>
 	</repositories>
 	
 	<name>Fourier Ring Correlation Plugin</name>
-	<url>https://imagej.net/Fourier_Ring_Correlation_Plugin</url>
+	<url>https://imagej.net/plugins/fourier-ring-correlation</url>
 	<inceptionYear>2016</inceptionYear>
 	<organization>
 		<name>BIOP</name>
@@ -79,14 +87,10 @@
 		<url>https://github.com/BIOP/ijp-frc/issues</url>
 		<system>GitHub Issues</system>
 	</issueManagement>
-	<ciManagement>
-		<system>none</system>
-		<url>none</url>
-	</ciManagement>
 
 	<scm>
 		<tag>HEAD</tag>
-		<url>https://c4science.ch/source/ijp-frc.git</url>
+		<url>https://github.com/BIOP/ijp-frc.git</url>
 	</scm>
 
 	<properties>
@@ -111,7 +115,7 @@
 			<artifactId>fiji-lib</artifactId>			
 		</dependency>
 	</dependencies>
-	<build>
+	<!--<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -124,12 +128,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build>-->
 
-	<groupId>ch.epfl.biop</groupId>
-	<artifactId>FRC_</artifactId>
-	<description>Making use of the Fourier Ring Correlation Implementation by Alex Herbert
-which is itself 'adapted from the FIRE (Fourier Image REsolution) plugin produced as part of the paper
-Niewenhuizen, et al (2013). Measuring image resolution in optical nanoscopy. Nature Methods, 10, 557
-http://www.nature.com/nmeth/journal/v10/n6/full/nmeth.2448.html</description>
+
 </project>

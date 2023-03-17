@@ -16,6 +16,8 @@ http://biop.epfl.ch
 
 ## Installation
 
+To use this plugin, you can simply [activate the `PTBIOP` update site](https://imagej.net/update-sites/following).
+
 Please refer to the instructions on the Wiki page of the plugin, at http://imagej.net/Fourier_Ring_Correlation_Plugin#Installation
 
 ## Source Code

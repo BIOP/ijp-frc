@@ -14,6 +14,15 @@ It is implemented as an Eclipse Plugin, with Maven dependencies for ImageJ/Fiji.
 Maintained by Olivier Burri at the BioImaging and Optics Platform (BIOP)
 http://biop.epfl.ch
 
+# Limitations
+
+The following limitations are known and will currently not be adressed. 
+Other packages that are FRC capable should be favored such as [NanoJ-SQUIRREL](https://github.com/HenriquesLab/NanoJ-SQUIRREL)
+
+## Known Limitations
+- Scaling due to image size: The Fourier transform extends the image to the next power of two, **so be very careful** if you are comparing images of different sizes. The recommendation is to use a crop of your data that is a power of two (128, 256, 512, 1024, ...).
+
+
 ## Installation
 
 To use this plugin, you can simply [activate the `PTBIOP` update site](https://imagej.net/update-sites/following).
